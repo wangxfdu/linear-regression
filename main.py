@@ -192,7 +192,7 @@ def _onDumpResult(evt):
         showError('No selection!')
         return
  
-    if _load1.values_orig.shape[0] != _load2.values_orig.shape[0] :
+    if _load1.values_orig.shape[1] != _load2.values_orig.shape[1] :
         showError("Data length doesn't match!")
         return
 
