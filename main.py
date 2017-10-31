@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-http://blog.csdn.net/chenghit
-"""
+
 import wx
 import os
 import numpy as np
