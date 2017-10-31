@@ -9,45 +9,6 @@ import xlwt
 import gc
 import traceback
 
-class MainWindow(wx.Frame):
-    """We simply derive a new class of Frame."""
-    def __init__(self, parent, title):
-        wx.Frame.__init__(self, parent, title = title, size = (600, 400))
-        self.control = wx.TextCtrl(self, style = wx.TE_MULTILINE)
-        self.CreateStatusBar()    # 创建位于窗口的底部的状态栏
-
-        # 设置菜单
-        filemenu = wx.Menu()
-
-        # wx.ID_ABOUT和wx.ID_EXIT是wxWidgets提供的标准ID
-        menuAbout = filemenu.Append(wx.ID_ABOUT, "&About", \
-            " Information about this program")    # (ID, 项目名称, 状态栏信息)
-        filemenu.AppendSeparator()
-        menuExit = filemenu.Append(wx.ID_EXIT, "E&xit", \
-            " Terminate the program")    # (ID, 项目名称, 状态栏信息)
-
-        # 创建菜单栏
-        menuBar = wx.MenuBar()
-        menuBar.Append(filemenu, "&File")    # 在菜单栏中添加filemenu菜单
-        self.SetMenuBar(menuBar)    # 在frame中添加菜单栏
-
-        # 设置events
-        self.Bind(wx.EVT_MENU, self.OnAbout, menuAbout)
-        self.Bind(wx.EVT_MENU, self.OnExit, menuExit)
-
-        self.Show(True)
-
-    def OnAbout(self, e):
-        # 创建一个带"OK"按钮的对话框。wx.OK是wxWidgets提供的标准ID
-        dlg = wx.MessageDialog(self, "A small text editor.", \
-            "About Sample Editor", wx.OK)    # 语法是(self, 内容, 标题, ID)
-        dlg.ShowModal()    # 显示对话框
-        dlg.Destroy()    # 当结束之后关闭对话框
-
-    def OnExit(self, e):
-        self.Close(True)    # 关闭整个frame
-
-
 class FileLoader():
     def __init__(self, parent, axis=""):
         self.loadButton = wx.Button(parent, label = "Open " + axis)
@@ -114,8 +75,13 @@ class FileLoader():
             #print contents
             contentArr = np.array([l.split() for l in contents])
             f.close()
-            self.names_orig = contentArr[:, 0]
-            self.values_orig = contentArr[:,1:].astype(np.float)
+
+            name_orig_temp = contentArr[:, 0];
+            sort_arg = np.argsort(name_orig_temp)
+            
+            self.names_orig = name_orig_temp[sort_arg]
+            self.values_orig = contentArr[:,1:][sort_arg].astype(np.float)
+
         except BaseException:
             showError(traceback.format_exc())
         finally :
@@ -141,14 +107,18 @@ class FileLoader():
         wx.EndBusyCursor()
 
     def _RefreshList(self, searchString, sort=0):
-        searchString = searchString.upper()
+        searchString = searchString.upper().strip()
         self.nameList.Clear()
-        sort_arg = np.argsort(self.names_orig)
-        names_sort = self.names_orig[sort_arg]
-        search_array = np.array([ l.upper().find(searchString) >= 0 for l in names_sort])
+        if searchString == "" :
+            self.names_disp = self.names_orig
+            self.values_disp = self.values_orig
+        else :
+        #sort_arg = np.argsort(self.names_orig)
+        #names_sort = self.names_orig[sort_arg]
+            search_array = np.array([ l.upper().find(searchString) >= 0 for l in self.names_orig])
         #print search_array
-        self.names_disp = names_sort[search_array]
-        self.values_disp = self.values_orig[sort_arg][search_array]
+            self.names_disp = self.names_orig[search_array]
+            self.values_disp = self.values_orig[search_array]
         
         #for name in self.names_disp :
         #    self.nameList.Append(name)
@@ -221,6 +191,10 @@ def _onDumpResult(evt):
     if index < 0 or load2.names_orig is None or load2.names_orig.size <= 0 :
         showError('No selection!')
         return
+ 
+    if _load1.values_orig.shape[0] != _load1.values_orig.shape[0] :
+        showError("Data length doesn't match!")
+        return
 
     dlg = wx.FileDialog(
             frame, message="Choose a file",
@@ -248,14 +222,15 @@ def _onDumpResult(evt):
     ws.write(0, 1, "R")
     ws.write(0, 2, "P")
 
-    for index2 in range(1, _load2.values_orig.shape[0]) :
+    for index2 in range(0, _load2.values_orig.shape[0]) :
+        index2_xls = index2 + 1
         if evt.GetId() == ID_DUMP1 :
             (r, p) = stats.pearsonr(data1, _load2.values_orig[index2])
         else:
             (r, p) = stats.pearsonr(_load2.values_orig[index2], data1)
-        ws.write(index2, 0, _load2.names_orig[index2])
-        ws.write(index2, 1, r)
-        ws.write(index2, 2, p)
+        ws.write(index2_xls, 0, _load2.names_orig[index2])
+        ws.write(index2_xls, 1, r)
+        ws.write(index2_xls, 2, p)
     
     wb.save(path)
     showError("DONE!")
