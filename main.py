@@ -236,6 +236,18 @@ def _onDumpResult(evt):
     showError("DONE!")
     pass
 
+def onAbout(evt):
+    msg = '''All rights reserved
+
+Author: Xiang Wang (wangxfdu@163.com)
+    '''
+    dlg = wx.MessageDialog(None, msg,
+                           'About',
+                           wx.OK | wx.ICON_INFORMATION
+                           )
+    dlg.ShowModal()
+    dlg.Destroy()
+
 app = wx.App(False)
 frame = wx.Frame(None, title = "Linear Regression (v1.0)", size = (400,400))
 
@@ -269,14 +281,22 @@ menuDump1 = filemenu.Append(ID_DUMP1, "Left(1) vs Right(All)", \
 menuDump2 = filemenu.Append(ID_DUMP2, "Left(All) vs Right(1)", \
             " Terminate the program")    # (ID, 项目名称, 状态栏信息)
 
+# Help Menu
+helpMenu = wx.Menu()
+menuAbout = helpMenu.Append(wx.ID_ABOUT, "About", "About")
+
 # 创建菜单栏
 menuBar = wx.MenuBar()
 menuBar.Append(filemenu, "&File")    # 在菜单栏中添加filemenu菜单
+menuBar.Append(helpMenu, "&Help")
 frame.SetMenuBar(menuBar)    # 在frame中添加菜单栏
 
 # 设置events
 frame.Bind(wx.EVT_MENU, onDumpResult, menuDump1)
 frame.Bind(wx.EVT_MENU, onDumpResult, menuDump2)
+frame.Bind(wx.EVT_MENU, onAbout, menuAbout)
+
+
 
 frame.Show()
 
