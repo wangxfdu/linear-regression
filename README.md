@@ -7,7 +7,7 @@
   * 在程序中找到"Anaconda Prompt"，点击运行
   * 输入conda install -c anaconda wxpython，回车。若有提示，输入y。（此步骤需要网络）
   * 安装成功，关闭退出
-  * PS: 如果下载非常慢，请在执行conda install之前额外输入以下命令 (尚未亲测)
+  * PS: 如果下载非常慢，请在执行conda install之前额外输入以下命令 (尚未亲测)
     * conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main/
     * conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/
     * conda config --set show_channel_urls yes
