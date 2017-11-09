@@ -38,7 +38,8 @@ class FileLoader():
         
         self.parent = parent
 
-        self.names_orig = None
+        self.names_orig = np.array([])
+        self.values_orig = np.array([])
     def OnSearch(self, evt):
         if evt.GetEventType() == wx.EVT_SEARCHCTRL_CANCEL_BTN.typeId:
             self.search.Clear()
@@ -109,7 +110,7 @@ class FileLoader():
     def _RefreshList(self, searchString, sort=0):
         searchString = searchString.upper().strip()
         self.nameList.Clear()
-        if searchString == "" :
+        if searchString == "" or self.names_orig.size <= 0:
             self.names_disp = self.names_orig
             self.values_disp = self.values_orig
         else :
@@ -188,7 +189,7 @@ def _onDumpResult(evt):
         _load2 = load1
 
     index = _load1.nameList.GetSelection()
-    if index < 0 or load2.names_orig is None or load2.names_orig.size <= 0 :
+    if index < 0 or load2.names_orig.size <= 0 :
         showError('No selection!')
         return
  
@@ -197,7 +198,7 @@ def _onDumpResult(evt):
         return
 
     dlg = wx.FileDialog(
-            frame, message="Choose a file",
+            frame, message="Save to file",
             defaultDir=os.getcwd(), 
             defaultFile="",
             wildcard="Excel file (*.xls) |*.xls",
@@ -249,7 +250,7 @@ Author: Xiang Wang (wangxfdu@163.com)
     dlg.Destroy()
 
 app = wx.App(False)
-frame = wx.Frame(None, title = "Linear Regression (v1.0)", size = (400,400))
+frame = wx.Frame(None, title = "Linear Regression (v1.1)", size = (400,400))
 
 bkg = wx.Panel(frame)
 
